@@ -74,10 +74,10 @@ async def createLobby(ctx):
     description = "5v5 Lobby created at " + timestr + " on " +  datestr + "\n\n**For Players**\nTo join, react with ✅\nTo leave, react with ❌\n\n**For Lobby Leader**\nTo close the lobby, react with 😭\n To begin match, react with 💢\n"
     
     embed=discord.Embed(title="League 5v5" , url="https://github.com/Tentacultist/Inhouses", description=description, color=0x006cfa)
-    embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+    embed.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
     embed.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
     
-    playerlist = [ctx.author.display_name,"---------","---------","---------","---------","---------","---------","---------","---------","---------"]
+    playerlist = [ctx.message.author.name,"---------","---------","---------","---------","---------","---------","---------","---------","---------"]
     playeridlist = [ctx.author.id, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     embed.add_field(name="Queued Players", value="{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n".format(*playerlist), inline=True)
@@ -98,6 +98,10 @@ async def createLobby(ctx):
 
         reaction = await bot.wait_for("reaction_add", check=checkReaction)
 
+        userid = reaction[1].id
+        user = await bot.fetch_user(userid)
+        usernick = user.display_name
+
         # closes lobby
         if str(reaction[0]) == '😭':
             
@@ -112,10 +116,6 @@ async def createLobby(ctx):
         
         if str(reaction[0]) == '✅':
             
-            userid = reaction[1].id
-            user = await bot.fetch_user(userid)
-            usernick = user.display_name
-
             # user is already in lobby
             if userid in playeridlist:
                 
@@ -141,20 +141,31 @@ async def createLobby(ctx):
             playerlist[firstOpen] = usernick
             playeridlist[firstOpen] = userid
 
-            
-
             # embed stuff
-            embedAdd=discord.Embed(title="League 5v5" , url="https://github.com/Tentacultist/Inhouses", description=description, color=0x006cfa)
-            embedAdd.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
-            embedAdd.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
-            embedAdd.add_field(name="Queued Players", value="{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n".format(*playerlist), inline=True)
+            embedAdd=util.embedEdit(ctx, msg, playerlist)
             
             await msg.edit(embed=embedAdd)
 
             await msg.remove_reaction(reaction[0], user)
         
         if str(reaction[0]) == '❌':
-            print("remove dn")
+            
+            if(userid not in playeridlist):
+                await ctx.send("You are not in the queue")
+                await msg.remove_reaction(reaction[0], user)
+                continue
+
+            playeridlist.remove(userid)
+            playeridlist.append(0)
+
+            playerlist.remove(usernick)
+            playerlist.append("---------")
+
+            embedAdd = util.embedEdit(ctx, msg, playerlist)
+            
+            await msg.edit(embed=embedAdd)
+
+            await msg.remove_reaction(reaction[0], user)
 
         # splits list of players into 2 and then displays
         if str(reaction[0]) == '💢':
