@@ -2,7 +2,6 @@
 # bot.py
 
 import os
-import json
 import urllib
 
 from discord.ext import commands
@@ -12,6 +11,7 @@ import utils.utilities as util
 import utils.rankUtil as rws
 import utils.jsonUtil as jsu
 
+os.chdir('C:/Users/Lucas/Documents/Inhouses/bot')
 
 commandPrefix = '!'
 
