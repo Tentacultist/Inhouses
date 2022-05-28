@@ -160,8 +160,6 @@ async def createLobby(ctx):
         if str(reaction[0]) == '💢':
             await ctx.send(":^)")
 
-    # need way to leave the lobby
-
     # at any number of people, will split the players in half based on rank lp, need to make module to determine rank/number associated, use algo to return
 
 
