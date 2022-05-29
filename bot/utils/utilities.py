@@ -23,37 +23,3 @@ def embedEdit(ctx, playerlist: list) -> discord.Embed:
     
     return embedAdd
 
-def rankValue(rank: str) -> int:
-
-    rankValue = 0
-
-    if rank == "Challenger":
-        return 60
-
-    if rank == "Grandmaster":
-        return 50
-
-    if rank == "Master":
-        return 40
-
-    strSplit = rank.split()
-
-    rankWord = strSplit[0]
-    rankNumber = int(strSplit[1])
-
-    if rankWord == "Iron":
-        rankValue += 10
-    elif rankWord == "Bronze":
-        rankValue += 15
-    elif rankWord == "Silver":
-        rankValue += 20
-    elif rankWord == "Gold":
-        rankValue += 25
-    elif rankWord == "Platinum":
-        rankValue += 30
-    elif rankWord == "Diamond":
-        rankValue += 35
-
-    rankValue = rankValue + (5 - rankNumber)
-
-    return rankValue

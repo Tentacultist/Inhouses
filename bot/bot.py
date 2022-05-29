@@ -103,7 +103,7 @@ async def createLobby(ctx):
         usernick = user.display_name
 
         # closes lobby
-        if str(reaction[0]) == '😭':
+        if str(reaction[0]) == '😭' and userid == ctx.author.id:
             
             descriptionClosed = "Restart lobby with `!lobby`\nOr you guys can touch grass\n"
             embedClosed = discord.Embed(title="Lobby Closed", description=descriptionClosed)
@@ -168,7 +168,7 @@ async def createLobby(ctx):
             await msg.remove_reaction(reaction[0], user)
 
         # splits list of players into 2 and then displays
-        if str(reaction[0]) == '💢':
+        if str(reaction[0]) == '💢' and userid == ctx.author.id:
             await ctx.send(":^)")
 
     # at any number of people, will split the players in half based on rank lp, need to make module to determine rank/number associated, use algo to return
