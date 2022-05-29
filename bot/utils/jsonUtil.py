@@ -71,3 +71,10 @@ def recalculateWL(players: list):
     
     with open("users.json", "w") as outfile:
         outfile.write(json.dumps(data, indent=4))
+
+def getRank(id: int):
+
+    with open("users.json", "r") as infile:
+        data = json.load(infile)
+
+    return data[str(id)]["rank"]
