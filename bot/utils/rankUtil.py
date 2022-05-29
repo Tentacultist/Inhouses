@@ -27,13 +27,13 @@ def rankValue(rank: str) -> int:
     rankValue = 0
 
     if rank == "Challenger":
-        return 60
+        rankValue = 45
 
     if rank == "Grandmaster":
-        return 50
+        rankValue = 42
 
     if rank == "Master":
-        return 40
+        rankValue = 40
 
     strSplit = rank.split()
 
@@ -41,18 +41,46 @@ def rankValue(rank: str) -> int:
     rankNumber = int(strSplit[1])
 
     if rankWord == "Iron":
-        rankValue += 10
+        rankValue = 5
+
     elif rankWord == "Bronze":
-        rankValue += 15
+        rankValue = 10
+
     elif rankWord == "Silver":
-        rankValue += 20
+        if rankNumber == 1 or rankNumber == 2:
+            rankValue = 16
+        if rankNumber == 3 or rankNumber == 4:
+            rankValue = 15
+
     elif rankWord == "Gold":
-        rankValue += 25
+        if rankNumber == 1:
+            rankValue =  20
+        if rankNumber == 2:
+            rankValue = 19
+        if rankNumber == 3:
+            rankValue = 18
+        if rankNumber == 4:
+            rankValue = 17
+
     elif rankWord == "Platinum":
-        rankValue += 30
+        if rankNumber == 1:
+            rankValue = 27
+        if rankNumber == 2:
+            rankValue = 26
+        if rankNumber == 3:
+            rankValue = 23
+        if rankNumber == 4:
+            rankValue = 21
+
     elif rankWord == "Diamond":
-        rankValue += 35
-
-    rankValue = rankValue + (5 - rankNumber)
-
+        if rankNumber == 1:
+            rankValue = 36
+        if rankNumber == 2:
+            rankValue = 34
+        if rankNumber == 3:
+            rankValue = 31
+        if rankNumber == 4:
+            rankValue = 29
+            
     return rankValue
+

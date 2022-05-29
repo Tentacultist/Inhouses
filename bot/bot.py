@@ -196,12 +196,12 @@ async def createLobby(ctx):
             for emoji in gameEmojis:
                 await msg.add_reaction(emoji)
 
-
             gameDescription = "**Match Start!** Good luck and have fun\n\n**For Lobby Leader**\nTo cancel match, react with ✋\n Blue team win, 🟦\nRed team win, 🟥"
 
             embedGame=discord.Embed(title="League 5v5 Match" , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
             embedGame.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
             embedGame.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
+            
             #embedGame.add_field(name="Team One", value="{}\n{}\n{}\n{}\n{}".format(*teamOne), inline=True)
             #embedGame.add_field(name="Team Two", value="{}\n{}\n{}\n{}\n{}".format(*teamTwo), inline=True)
 
@@ -227,7 +227,19 @@ async def createLobby(ctx):
 
                     return
                 
-                
+                if (str(reaction[0]) == '🟦' or str(reaction[0]) == '🟥') and userid == ctx.author.id:
+                    
+                    if str(reaction[0]) == '🟦':
+
+                        jsu.incrementWin(teamOne)
+                        jsu.incrementLoss(teamTwo)
+
+                    if str(reaction[0]) == '🟥':
+
+                        jsu.incrementWin(teamTwo)
+                        jsu.incrementLoss(teamOne)
+
+
                         
 
 
