@@ -61,9 +61,13 @@ async def set_rank(ctx, *args):
 
             await ctx.send("Added player **" + ign + "** with rank **" + rank + "**")
 
+            return
+
         if str(reaction[0]) == '❌':
 
             await ctx.send("Please restart with the proper ign\nOr make sure to update your u.gg found at https://u.gg/lol/profile/na1/" + urllib.parse.quote(ign) + "/overview")
+
+            return
 
 # 5 v 5 lobby, automatically balanced based on rank, then decide winners and losers, winners increment wins, losers increment loss, win/win+loss for winrate
 @bot.command("lobby")
@@ -142,7 +146,7 @@ async def createLobby(ctx):
             playeridlist[firstOpen] = userid
 
             # embed stuff
-            embedAdd=util.embedEdit(ctx, msg, playerlist)
+            embedAdd=util.embedEdit(ctx, playerlist)
             
             await msg.edit(embed=embedAdd)
 
@@ -161,7 +165,7 @@ async def createLobby(ctx):
             playerlist.remove(usernick)
             playerlist.append("---------")
 
-            embedAdd = util.embedEdit(ctx, msg, playerlist)
+            embedAdd = util.embedEdit(ctx, playerlist)
             
             await msg.edit(embed=embedAdd)
 
@@ -205,6 +209,7 @@ async def createLobby(ctx):
             #embedGame.add_field(name="Team One", value="{}\n{}\n{}\n{}\n{}".format(*teamOne), inline=True)
             #embedGame.add_field(name="Team Two", value="{}\n{}\n{}\n{}\n{}".format(*teamTwo), inline=True)
 
+            #testing purposes
             list1 = ["*Guy 1", "*Guy 2", "*Guy 3", "*Guy 4", "*Guy 5"]
             list2 = ["*Guy 6", "*Guy 7", "*Guy 8", "*Guy 9", "*Guy 10"]
             embedGame.add_field(name="Blue Team", value="{}\n{}\n{}\n{}\n{}".format(*list1), inline=True)
@@ -238,6 +243,8 @@ async def createLobby(ctx):
 
                         jsu.incrementWin(teamTwo)
                         jsu.incrementLoss(teamOne)
+                    
+                    
 
 
                         
