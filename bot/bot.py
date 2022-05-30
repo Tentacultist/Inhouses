@@ -244,7 +244,7 @@ async def createLobby(ctx):
                         jsu.incrementWin(teamTwo)
                         jsu.incrementLoss(teamOne)
                     
-                    
+                                    
 
 
                         
