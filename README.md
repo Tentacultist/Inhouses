@@ -1,19 +1,22 @@
-# Inhouses
+# Inhouse Bot
+![This is an image](https://i.imgur.com/aPHyJmo.png)
 
-Discord bot made in python 3.9
+## What is it?
+- Discord bot made in python 3.9
 
-Aimed to allow our private server easier 5v5 inhouse lobbies
+- Aimed to allow our private server easier 5v5 inhouse lobbies
 
-Create and Queue up in a lobby, authomatically configures teams based on in game ranks.
+- Create and Queue up in a lobby, authomatically configures teams based on in game ranks.
 
-Tracks wins and losses
+## Command List with Descriptions
 
-| Command          | Desc                                                |
-| ---------------- | ---------------------------------------------------:|
-| !setup [NAME]    | connects your summoner name to your discord account |
-| !profile         | shows your profile                                  |
-| !help            | shows list of commands                              |
-| !create          | creates inhouse room                                |
-| !join            |  joins the inhouse room                             |
-| !leave           |  leaves the inhouse room                            |
-| !cancel          | cancels the inhouse room                            |
+| Command          | Description                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------|
+| !setup [NAME]    | Links the associated summoner name (NA) to the discord user                                |
+| !profile         | Shows your profile                                                                         |
+| !help            | Shows list of all commands                                                                 |
+| !leaderboard     | Displays all linked players in descending order based on rank                              |
+| !lobby           | Creates a eqaulized lobby[^1] where users are able to join by pressing on the reactions[^2]|
+
+[^1]Lobbies are equalized automatically based on everyones linked account's rank
+[^2]Lobbies are only canceled or started by the person who creates the lobby. The lobby creator is also responsible for declaring the winner of the match
