@@ -1,5 +1,5 @@
 # Inhouse Bot
-![This is an image](https://i.imgur.com/aPHyJmo.png)
+![This is an image](https://i.imgur.com/aPHyJmo.png) <- Best Girl
 
 ## What is it?
 - Discord bot made in python 3.9
