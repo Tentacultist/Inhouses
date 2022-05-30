@@ -65,7 +65,7 @@ async def set_rank(ctx, *args):
 
         if str(reaction[0]) == '❌':
 
-            await ctx.send("Please restart with the proper ign\nOr make sure to update your u.gg found at https://u.gg/lol/profile/na1/" + urllib.parse.quote(ign) + "/overview")
+            await ctx.send("Please restart with the proper ign\nOr perhaps you might have decayed recently")
 
             return
 

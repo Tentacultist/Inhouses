@@ -28,7 +28,6 @@ def get_Rank(username: str) -> str:
             return ""
     else:
         return ""
-    
 
 def rankValue(rank: str) -> int:
 
