@@ -1,24 +1,30 @@
-import cloudscraper
 import bs4
 import urllib
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_Rank(username: str) -> str:
-   
-    try:
 
-        scraper = cloudscraper.create_scraper()
+    API_KEY = os.environ.get("API_KEY")
+    SUMMONER_API = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{username}?api_key={API_KEY}"
 
-        safeLink = "https://u.gg/lol/profile/na1/" + urllib.parse.quote(username) + "/overview"
+    response = requests.get(f"{SUMMONER_API}")
+    if response.status_code == 200:
+        SUMMONER_ID = response["id"]
+        RANKED_API = f"https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/{SUMMONER_ID}?api_key={API_KEY}"
 
-        s = scraper.get(safeLink).text
+        ranked_response = requests.get(f"{RANKED_API}")
+        if ranked_response.status_code == 200:
+            TIER = ranked_response["tier"]
+            RANK = ranked_response["rank"]
 
-        response_html = bs4.BeautifulSoup(s, features="html.parser")
-
-        d = response_html.find_all("div", {"class":"rank-text"})
-
-        return d[0].findAll("strong")[0].text
-
-    except:
+            return f"{TIER} {RANK}"
+        else:
+            return ""
+    else:
         return ""
     
 
