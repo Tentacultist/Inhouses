@@ -8,6 +8,13 @@ load_dotenv()
 
 def get_Rank(username: str) -> str:
 
+    rank_number = {
+        "I": "1",
+        "II": "2",
+        "III": "3",
+        "IV": "4"
+    }
+
     API_KEY = os.environ.get("API_KEY")
     SUMMONER_API = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{username}?api_key={API_KEY}"
 
@@ -20,15 +27,21 @@ def get_Rank(username: str) -> str:
         ranked_response = requests.get(f"{RANKED_API}")
         if ranked_response.status_code == 200:
             ranked_json = ranked_response.json()
-            TIER = ranked_json[0]["tier"]
-            RANK = ranked_json[0]["rank"]
+
+            TIER = "Unranked"
+            RANK = ""
+
+            for entry in ranked_json:
+                if entry["queueType"] == "RANKED_SOLO_5x5":
+                    TIER = entry["tier"].lower().capitalize()
+                    RANK = rank_number[entry["rank"]]
+                    break;
 
             return f"{TIER} {RANK}"
         else:
             return ""
     else:
         return ""
-    
 
 def rankValue(rank: str) -> int:
 
