@@ -3,6 +3,7 @@ import bs4
 import urllib
 
 def get_Rank(username: str) -> str:
+   
     try:
 
         scraper = cloudscraper.create_scraper()
@@ -17,7 +18,6 @@ def get_Rank(username: str) -> str:
 
         return d[0].findAll("strong")[0].text
 
-        
     except:
         return ""
     
