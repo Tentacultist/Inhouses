@@ -20,8 +20,8 @@ def get_Rank(username: str) -> str:
         ranked_response = requests.get(f"{RANKED_API}")
         if ranked_response.status_code == 200:
             ranked_json = ranked_response.json()
-            TIER = ranked_json["tier"]
-            RANK = ranked_json["rank"]
+            TIER = ranked_json[0]["tier"]
+            RANK = ranked_json[0]["rank"]
 
             return f"{TIER} {RANK}"
         else:
@@ -91,4 +91,3 @@ def rankValue(rank: str) -> int:
             rankValue = 29
             
     return rankValue
-
