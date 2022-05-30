@@ -30,20 +30,6 @@ def setup(userid: str, ign: str, rank: str, userdata):
 
         userdata.update_one(filter, newValues)
 
-# def incrementWin(winners: list):
-    
-#     with open("users.json", "r") as infile:
-#         data = json.load(infile)
-
-#     for id in winners:
-#         data[str(id)]["win"] = data[str(id)]["win"] + 1
-#         data[str(id)]["lp"] = 15 + data[str(id)]["lp"]
-    
-#     with open("users.json", "w") as outfile:
-#         outfile.write(json.dumps(data, indent=4))
-    
-#     recalculateWL(winners)
-
 def incrementWin(winners: list, userdata):
     
     for winner in winners:
@@ -79,14 +65,6 @@ def incrementLoss(losers: list, userdata):
                                 "lp": newLp } }
 
         userdata.update_one(filter, newValues)
-
-
-def getRank(id: int):
-
-    with open("users.json", "r") as infile:
-        data = json.load(infile)
-
-    return data[str(id)]["rank"]
 
 def getPlayerData(id: int):
 
