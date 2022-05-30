@@ -1,26 +1,47 @@
-import cloudscraper
 import bs4
 import urllib
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_Rank(username: str) -> str:
-   
-    try:
 
-        scraper = cloudscraper.create_scraper()
+    rank_number = {
+        "I": "1",
+        "II": "2",
+        "III": "3",
+        "IV": "4"
+    }
 
-        safeLink = "https://u.gg/lol/profile/na1/" + urllib.parse.quote(username) + "/overview"
+    API_KEY = os.environ.get("API_KEY")
+    SUMMONER_API = f"https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/{username}?api_key={API_KEY}"
 
-        s = scraper.get(safeLink).text
+    response = requests.get(f"{SUMMONER_API}")
+    if response.status_code == 200:
+        summoner_json = response.json()
+        SUMMONER_ID = summoner_json["id"]
+        RANKED_API = f"https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/{SUMMONER_ID}?api_key={API_KEY}"
 
-        response_html = bs4.BeautifulSoup(s, features="html.parser")
+        ranked_response = requests.get(f"{RANKED_API}")
+        if ranked_response.status_code == 200:
+            ranked_json = ranked_response.json()
 
-        d = response_html.find_all("div", {"class":"rank-text"})
+            TIER = "Unranked"
+            RANK = ""
 
-        return d[0].findAll("strong")[0].text
+            for entry in ranked_json:
+                if entry["queueType"] == "RANKED_SOLO_5x5":
+                    TIER = entry["tier"].lower().capitalize()
+                    RANK = rank_number[entry["rank"]]
+                    break;
 
-    except:
+            return f"{TIER} {RANK}"
+        else:
+            return ""
+    else:
         return ""
-    
 
 def rankValue(rank: str) -> int:
 
@@ -83,4 +104,3 @@ def rankValue(rank: str) -> int:
             rankValue = 29
             
     return rankValue
-

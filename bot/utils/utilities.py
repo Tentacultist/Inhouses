@@ -49,3 +49,4 @@ def splitTeams(playeridlist: list, playerRVList: list):
             teamOneRV += playerRVList[i]
 
     return teamOne, teamTwo
+

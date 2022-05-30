@@ -78,3 +78,10 @@ def getRank(id: int):
         data = json.load(infile)
 
     return data[str(id)]["rank"]
+
+def getPlayerData(id: int):
+
+    with open("users.json", "r") as infile:
+        data = json.load(infile)
+
+    return data[str(id)]["ign"],data[str(id)]["rank"],data[str(id)]["win"],data[str(id)]["loss"],data[str(id)]["winrate"],data[str(id)]["lp"]
