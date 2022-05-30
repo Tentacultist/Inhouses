@@ -13,13 +13,15 @@ def get_Rank(username: str) -> str:
 
     response = requests.get(f"{SUMMONER_API}")
     if response.status_code == 200:
-        SUMMONER_ID = response["id"]
+        summoner_json = response.json()
+        SUMMONER_ID = summoner_json["id"]
         RANKED_API = f"https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/{SUMMONER_ID}?api_key={API_KEY}"
 
         ranked_response = requests.get(f"{RANKED_API}")
         if ranked_response.status_code == 200:
-            TIER = ranked_response["tier"]
-            RANK = ranked_response["rank"]
+            ranked_json = ranked_response.json()
+            TIER = ranked_json["tier"]
+            RANK = ranked_json["rank"]
 
             return f"{TIER} {RANK}"
         else:
