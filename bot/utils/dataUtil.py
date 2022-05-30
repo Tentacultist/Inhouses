@@ -3,17 +3,7 @@ import pymongo
 import os
 from dotenv import load_dotenv
 
-def setup(userid: str, ign: str, rank: str):
-
-    load_dotenv()
-
-    username = os.getenv('MONGO_USER')
-    password = os.getenv('MONGO_PASS')
-
-    client = pymongo.MongoClient(f"mongodb+srv://{username}:{password}@inhouseusers.ur0plx1.mongodb.net/?retryWrites=true&w=majority")
-
-    db = client.inhouse
-    userdata = db.userdata
+def setup(userid: str, ign: str, rank: str, userdata):
 
     # if the user is not in the database
     if userdata.find_one({"userid":userid}) == None:
@@ -40,47 +30,56 @@ def setup(userid: str, ign: str, rank: str):
 
         userdata.update_one(filter, newValues)
 
-def incrementWin(winners: list):
+# def incrementWin(winners: list):
     
-    with open("users.json", "r") as infile:
-        data = json.load(infile)
+#     with open("users.json", "r") as infile:
+#         data = json.load(infile)
 
-    for id in winners:
-        data[str(id)]["win"] = data[str(id)]["win"] + 1
-        data[str(id)]["lp"] = 15 + data[str(id)]["lp"]
+#     for id in winners:
+#         data[str(id)]["win"] = data[str(id)]["win"] + 1
+#         data[str(id)]["lp"] = 15 + data[str(id)]["lp"]
     
-    with open("users.json", "w") as outfile:
-        outfile.write(json.dumps(data, indent=4))
+#     with open("users.json", "w") as outfile:
+#         outfile.write(json.dumps(data, indent=4))
     
-    recalculateWL(winners)
+#     recalculateWL(winners)
 
-def incrementLoss(losers: list):
+def incrementWin(winners: list, userdata):
     
-    with open("users.json", "r") as infile:
-        data = json.load(infile)
+    for winner in winners:
 
-    for id in losers:
-        data[str(id)]["loss"] = data[str(id)]["loss"] + 1
-        data[str(id)]["lp"] = -10 + data[str(id)]["lp"]
+        filter = {"userid":winner}
 
-        if(data[str(id)]["lp"] < 0):
-            data[str(id)]["lp"] = 0
+        newWin = userdata.find_one({"userid":winner})["win"] + 1 
+        newWinRate = newWin/(newWin + userdata.find_one({"userid":winner})["loss"])
+        newLp = userdata.find_one({"userid":winner})["lp"] + 15
+
+        newValues = { "$set": {"win": newWin,
+                                "winrate": newWinRate ,
+                                "lp": newLp } }
+
+        userdata.update_one(filter, newValues)
+
+def incrementLoss(losers: list, userdata):
     
-    with open("users.json", "w") as outfile:
-        outfile.write(json.dumps(data, indent=4))
+    for loser in losers:
 
-    recalculateWL(losers)
+        filter = {"userid":loser}
 
-def recalculateWL(players: list):
+        newLoss = userdata.find_one({"userid":loser})["loss"] + 1 
+        newWinRate = userdata.find_one({"userid":loser})["win"]/(userdata.find_one({"userid":loser})["win"] + newLoss)
 
-    with open("users.json", "r") as infile:
-        data = json.load(infile)
+        newLp = userdata.find_one({"userid":loser})["lp"] - 10
 
-    for id in players:
-        data[str(id)]["winrate"] = data[str(id)]["win"]/(data[str(id)]["win"]+data[str(id)]["loss"])
-    
-    with open("users.json", "w") as outfile:
-        outfile.write(json.dumps(data, indent=4))
+        if newLp < 0:
+            newLp = 0
+
+        newValues = { "$set": {"loss": newLoss,
+                                "winrate": newWinRate ,
+                                "lp": newLp } }
+
+        userdata.update_one(filter, newValues)
+
 
 def getRank(id: int):
 

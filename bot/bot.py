@@ -2,13 +2,12 @@
 # bot.py
 
 import os
-import urllib
 from datetime import date, datetime
-import time
 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+import pymongo
 
 import utils.utilities as util
 import utils.rankUtil as rws
@@ -18,11 +17,19 @@ os.chdir('C:/Users/Lucas/Documents/Inhouses/bot')
 
 commandPrefix = '!'
 
+# env data
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 GUILD = os.getenv('DISCORD_GUILD')
+username = os.getenv('MONGO_USER')
+password = os.getenv('MONGO_PASS')
 
 bot = commands.Bot(command_prefix=commandPrefix)
+
+#connecting to mongodb client
+client = pymongo.MongoClient(f"mongodb+srv://{username}:{password}@inhouseusers.ur0plx1.mongodb.net/?retryWrites=true&w=majority")
+db = client.inhouse
+userdata = db.userdata
 
 @bot.event
 async def on_ready():
@@ -57,7 +64,7 @@ async def set_rank(ctx, *args):
 
         if str(reaction[0]) == '✅':
             
-            dsu.setup(userid=str(ctx.author.id),ign=ign,rank=rank)
+            dsu.setup(userid=str(ctx.author.id),ign=ign,rank=rank,userdata=userdata)
 
             await ctx.send("Added player **" + ign + "** with rank **" + rank + "**")
 
