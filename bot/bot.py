@@ -174,11 +174,11 @@ async def createLobby(ctx):
         # splits list of players into 2 and then displays
         if str(reaction[0]) == '💢' and userid == ctx.author.id:
             
-            #if playeridlist[9] == 0:
+            if playeridlist[9] == 0:
 
-                #await ctx.send("There are not enough players in the queue")
-                #await msg.remove_reaction(reaction[0], user)
-                #continue
+                await ctx.send("There are not enough players in the queue")
+                await msg.remove_reaction(reaction[0], user)
+                continue
 
             playerRVList = []
 
@@ -206,14 +206,8 @@ async def createLobby(ctx):
             embedGame.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
             embedGame.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
             
-            #embedGame.add_field(name="Team One", value="{}\n{}\n{}\n{}\n{}".format(*teamOne), inline=True)
-            #embedGame.add_field(name="Team Two", value="{}\n{}\n{}\n{}\n{}".format(*teamTwo), inline=True)
-
-            #testing purposes
-            list1 = ["*Guy 1", "*Guy 2", "*Guy 3", "*Guy 4", "*Guy 5"]
-            list2 = ["*Guy 6", "*Guy 7", "*Guy 8", "*Guy 9", "*Guy 10"]
-            embedGame.add_field(name="Blue Team", value="{}\n{}\n{}\n{}\n{}".format(*list1), inline=True)
-            embedGame.add_field(name="Red Team", value="{}\n{}\n{}\n{}\n{}".format(*list2), inline=True)
+            embedGame.add_field(name="Team One", value="{}\n{}\n{}\n{}\n{}".format(*teamOne), inline=True)
+            embedGame.add_field(name="Team Two", value="{}\n{}\n{}\n{}\n{}".format(*teamTwo), inline=True)
 
             await msg.edit(embed=embedGame)
 
@@ -239,27 +233,53 @@ async def createLobby(ctx):
                         jsu.incrementWin(teamOne)
                         jsu.incrementLoss(teamTwo)
 
+
                     if str(reaction[0]) == '🟥':
 
                         jsu.incrementWin(teamTwo)
                         jsu.incrementLoss(teamOne)
-                    
-                                    
+
+                    descriptionMatchClosed = "Match is over **GG**"
+                    embedClosed = discord.Embed(title="Match Closed", description=descriptionMatchClosed)
+                    await msg.edit(embed=embedClosed)
+
+                    for emoji in gameEmojis:
+                        await msg.clear_reaction(emoji)
+
+                    return
 
 
-                        
 
-
-            
-
-
-
-    
-
-    # at any number of people, will split the players in half based on rank lp, need to make module to determine rank/number associated, use algo to return
-
+# at any number of people, will split the players in half based on rank lp, need to make module to determine rank/number associated, use algo to return
 
 # leaderboard 
+@bot.command("leaderboard")
+async def leaderboard(ctx):
+    print("leaderboard")
+
+
+@bot.command("profile")
+async def profile(ctx):
+    
+    userid = ctx.author.id
+
+    gameDescription = "NGL not that impressive"
+
+    userIgn, userRank, userWin, userLoss, userWR, userlp = jsu.getPlayerData(userid)
+
+    embedUser=discord.Embed(title=ctx.author.display_name , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
+    embedUser.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
+    embedUser.set_thumbnail(url=ctx.author.avatar_url)
+
+    embedUser.add_field(name="IGN", value=userIgn, inline=False)
+    embedUser.add_field(name="Rank", value=userRank, inline=True)
+    embedUser.add_field(name="Wins", value=userWin, inline=True)
+    embedUser.add_field(name="Losses", value=userLoss, inline=True)
+    embedUser.add_field(name="Winrate", value=userWR, inline=True)
+    embedUser.add_field(name="LP", value=userlp, inline=True)
+
+    msg = await ctx.send(embed=embedUser)
+
 
 # past lobbies :^)
 
