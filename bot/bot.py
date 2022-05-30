@@ -244,7 +244,7 @@ async def createLobby(ctx):
                         jsu.incrementWin(teamTwo)
                         jsu.incrementLoss(teamOne)
                     
-                                    
+
 
 
                         
@@ -260,6 +260,14 @@ async def createLobby(ctx):
 
 
 # leaderboard 
+@bot.command("leaderboard")
+async def leaderboard(ctx):
+    print("leaderboard")
+
+
+@bot.command("profile")
+async def profile(ctx):
+    print("profile")
 
 # past lobbies :^)
 
