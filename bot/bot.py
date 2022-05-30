@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 import utils.utilities as util
 import utils.rankUtil as rws
-import utils.jsonUtil as jsu
+import utils.dataUtil as dsu
 
 os.chdir('C:/Users/Lucas/Documents/Inhouses/bot')
 
@@ -57,7 +57,7 @@ async def set_rank(ctx, *args):
 
         if str(reaction[0]) == '✅':
             
-            jsu.setup(userid=str(ctx.author.id),ign=ign,rank=rank)
+            dsu.setup(userid=str(ctx.author.id),ign=ign,rank=rank)
 
             await ctx.send("Added player **" + ign + "** with rank **" + rank + "**")
 
@@ -184,7 +184,7 @@ async def createLobby(ctx):
 
             for id in playeridlist:
                 if(id != 0):
-                    playerRVList.append(rws.rankValue(jsu.getRank(id)))
+                    playerRVList.append(rws.rankValue(dsu.getRank(id)))
 
             # returns 2 teams of relatively equal strength, the player ids
             teamOne,teamTwo = util.splitTeams(playeridlist, playerRVList)
@@ -230,14 +230,14 @@ async def createLobby(ctx):
                     
                     if str(reaction[0]) == '🟦':
 
-                        jsu.incrementWin(teamOne)
-                        jsu.incrementLoss(teamTwo)
+                        dsu.incrementWin(teamOne)
+                        dsu.incrementLoss(teamTwo)
 
 
                     if str(reaction[0]) == '🟥':
 
-                        jsu.incrementWin(teamTwo)
-                        jsu.incrementLoss(teamOne)
+                        dsu.incrementWin(teamTwo)
+                        dsu.incrementLoss(teamOne)
 
                     descriptionMatchClosed = "Match is over **GG**"
                     embedClosed = discord.Embed(title="Match Closed", description=descriptionMatchClosed)
@@ -265,7 +265,7 @@ async def profile(ctx):
 
     gameDescription = "NGL not that impressive"
 
-    userIgn, userRank, userWin, userLoss, userWR, userlp = jsu.getPlayerData(userid)
+    userIgn, userRank, userWin, userLoss, userWR, userlp = dsu.getPlayerData(userid)
 
     embedUser=discord.Embed(title=ctx.author.display_name , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
     embedUser.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)

@@ -1,34 +1,66 @@
 import json
+import pymongo
+import os
+from dotenv import load_dotenv
 
 def setup(userid: str, ign: str, rank: str):
 
-    with open("users.json", "r") as infile:
-        data = json.load(infile)
+    load_dotenv()
 
-    #if the user id is in the json file
-    if(userid in data):
-        
-        data[userid]["ign"] = ign
-        data[userid]["rank"] = rank
-     
-    #if the user id is not in the json file
-    else:
+    username = os.getenv('MONGO_USER')
+    password = os.getenv('MONGO_PASS')
 
-        newUser = {
-            userid: {
+    client = pymongo.MongoClient(f"mongodb+srv://{username}:{password}@inhouseusers.ur0plx1.mongodb.net/?retryWrites=true&w=majority")
+
+    db = client.inhouse
+    userdata = db.userdata
+
+    newUser = {
+                "userid": userid,
                 "ign": ign,
                 "rank": rank,
                 "win": 0,
                 "loss": 0,
                 "winrate": 0,
                 "lp": 0
+            
             }
-        }
+    
+    print(newUser)
+    
+    userdata.insert_one(newUser)
 
-        data.update(newUser)
 
-    with open("users.json", "w") as outfile:
-        outfile.write(json.dumps(data, indent=4))
+
+# def setup(userid: str, ign: str, rank: str):
+
+#     with open("users.json", "r") as infile:
+#         data = json.load(infile)
+
+#     #if the user id is in the json file
+#     if(userid in data):
+        
+#         data[userid]["ign"] = ign
+#         data[userid]["rank"] = rank
+     
+#     #if the user id is not in the json file
+#     else:
+
+#         newUser = {
+#             userid: {
+#                 "ign": ign,
+#                 "rank": rank,
+#                 "win": 0,
+#                 "loss": 0,
+#                 "winrate": 0,
+#                 "lp": 0
+#             }
+#         }
+
+#         data.update(newUser)
+
+#     with open("users.json", "w") as outfile:
+#         outfile.write(json.dumps(data, indent=4))
 
 def incrementWin(winners: list):
     
