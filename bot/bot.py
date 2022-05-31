@@ -30,6 +30,7 @@ bot = commands.Bot(command_prefix=commandPrefix)
 client = pymongo.MongoClient(f"mongodb+srv://{username}:{password}@inhouseusers.ur0plx1.mongodb.net/?retryWrites=true&w=majority")
 db = client.inhouse
 userdata = db.userdata
+lobbydata = db.lobbydata
 
 @bot.event
 async def on_ready():
@@ -72,9 +73,44 @@ async def set_rank(ctx, *args):
 
         if str(reaction[0]) == '❌':
 
-            await ctx.send("Please restart with the proper ign\nOr perhaps you might have decayed recently")
+            await ctx.send("Please restart with the proper ign")
 
             return
+
+@bot.command("delete")
+async def delete(ctx):
+
+    if userdata.find_one({"userid":str(ctx.author.id)}) != None:
+        
+        userign = userdata.find_one({"userid":str(ctx.author.id)})["ign"] 
+        userrank = userdata.find_one({"userid":str(ctx.author.id)})["rank"] 
+        
+        msg = await ctx.send(f"Are you sure you want to reset player {userign} with rank {userrank}?")
+
+        emojis = ['✅', '❌']
+
+        for emoji in emojis:
+            await msg.add_reaction(emoji)
+
+        def check(reaction, user):
+            return user == ctx.message.author and reaction.message == msg
+        
+        reaction = await bot.wait_for("reaction_add", check=check)  # Wait for a reaction
+
+        if str(reaction[0]) == '✅':
+
+            userdata.delete_one({"userid":str(ctx.author.id)})
+
+            await ctx.send("You're gone.")
+        
+        if str(reaction[0]) == '❌':
+
+            await ctx.send("You're not gone.")
+
+            return
+
+    else:
+        await ctx.send("You are not in our database")
 
 # 5 v 5 lobby, automatically balanced based on rank, then decide winners and losers, winners increment wins, losers increment loss, win/win+loss for winrate
 @bot.command("lobby")
@@ -88,7 +124,7 @@ async def createLobby(ctx):
     embed.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
     embed.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
     
-    playerlist = [ctx.message.author.name,"---------","---------","---------","---------","---------","---------","---------","---------","---------"]
+    playerlist = [userdata.find_one({"userid":str(ctx.author.id)})["ign"],"---------","---------","---------","---------","---------","---------","---------","---------","---------"]
     playeridlist = [ctx.author.id, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
     embed.add_field(name="Queued Players", value="{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n".format(*playerlist), inline=True)
@@ -111,7 +147,7 @@ async def createLobby(ctx):
 
         userid = reaction[1].id
         user = await bot.fetch_user(userid)
-        usernick = user.display_name
+        usernick = userdata.find_one({"userid":str(userid)})["ign"]
 
         # closes lobby
         if str(reaction[0]) == '😭' and userid == ctx.author.id:
@@ -181,17 +217,17 @@ async def createLobby(ctx):
         # splits list of players into 2 and then displays
         if str(reaction[0]) == '💢' and userid == ctx.author.id:
             
-            if playeridlist[9] == 0:
+            # if playeridlist[9] == 0:
 
-                await ctx.send("There are not enough players in the queue")
-                await msg.remove_reaction(reaction[0], user)
-                continue
+            #     await ctx.send("There are not enough players in the queue")
+            #     await msg.remove_reaction(reaction[0], user)
+            #     continue
 
             playerRVList = []
 
             for id in playeridlist:
                 if(id != 0):
-                    playerRVList.append(rws.rankValue(dsu.getRank(id)))
+                    playerRVList.append(rws.rankValue(userdata.find_one({"userid":str(id)})["rank"]))
 
             # returns 2 teams of relatively equal strength, the player ids
             teamOne,teamTwo = util.splitTeams(playeridlist, playerRVList)
@@ -208,13 +244,21 @@ async def createLobby(ctx):
                 await msg.add_reaction(emoji)
 
             gameDescription = "**Match Start!** Good luck and have fun\n\n**For Lobby Leader**\nTo cancel match, react with ✋\n Blue team win, 🟦\nRed team win, 🟥"
+            
+            teamOneDescription = "  "
+            for member in teamOne:
+                teamOneDescription = teamOneDescription + userdata.find_one({"userid":str(member)})["ign"] + "\n"
+
+            teamTwoDescription = ""
+            for member in teamTwo:
+                teamTwoDescription = teamTwoDescription + userdata.find_one({"userid":str(member)})["ign"] + "\n"
 
             embedGame=discord.Embed(title="League 5v5 Match" , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
             embedGame.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
             embedGame.set_thumbnail(url="https://pentagram-production.imgix.net/cc7fa9e7-bf44-4438-a132-6df2b9664660/EMO_LOL_02.jpg?rect=0%2C0%2C1440%2C1512&w=640&crop=1&fm=jpg&q=70&auto=format&fit=crop&h=672")
             
-            embedGame.add_field(name="Team One", value="{}\n{}\n{}\n{}\n{}".format(*teamOne), inline=True)
-            embedGame.add_field(name="Team Two", value="{}\n{}\n{}\n{}\n{}".format(*teamTwo), inline=True)
+            embedGame.add_field(name="Team One", value=teamOneDescription, inline=True)
+            embedGame.add_field(name="Team Two", value=teamTwoDescription, inline=True)
 
             await msg.edit(embed=embedGame)
 
@@ -235,18 +279,31 @@ async def createLobby(ctx):
                 
                 if (str(reaction[0]) == '🟦' or str(reaction[0]) == '🟥') and userid == ctx.author.id:
                     
+                    teamWinner = ""
+
                     if str(reaction[0]) == '🟦':
 
-                        dsu.incrementWin(teamOne)
-                        dsu.incrementLoss(teamTwo)
+                        dsu.incrementWin(teamOne, userdata)
+                        dsu.incrementLoss(teamTwo, userdata)
+
+                        teamWinner = "Blue Team"
 
 
                     if str(reaction[0]) == '🟥':
 
-                        dsu.incrementWin(teamTwo)
-                        dsu.incrementLoss(teamOne)
+                        dsu.incrementWin(teamTwo, userdata)
+                        dsu.incrementLoss(teamOne, userdata)
 
-                    descriptionMatchClosed = "Match is over **GG**"
+                        teamWinner = "Red Team"
+
+                    lobbydata.insert_one( {
+                        "date": date.today().strftime("%m/%d/%Y"),
+                        "blueTeam": teamOne,
+                        "redTeam": teamTwo,
+                        "winner": teamWinner,
+                    })
+
+                    descriptionMatchClosed = f"Match is over **GG**\n{teamWinner} wins!"
                     embedClosed = discord.Embed(title="Match Closed", description=descriptionMatchClosed)
                     await msg.edit(embed=embedClosed)
 
@@ -267,26 +324,30 @@ async def leaderboard(ctx):
 
 @bot.command("profile")
 async def profile(ctx):
-    
+
     userid = ctx.author.id
 
-    gameDescription = "NGL not that impressive"
+    if userdata.find_one({"userid":str(userid)}) != None:
 
-    userIgn, userRank, userWin, userLoss, userWR, userlp = dsu.getPlayerData(userid)
+        
 
-    embedUser=discord.Embed(title=ctx.author.display_name , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
-    embedUser.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
-    embedUser.set_thumbnail(url=ctx.author.avatar_url)
+        gameDescription = "NGL not that impressive"
 
-    embedUser.add_field(name="IGN", value=userIgn, inline=False)
-    embedUser.add_field(name="Rank", value=userRank, inline=True)
-    embedUser.add_field(name="Wins", value=userWin, inline=True)
-    embedUser.add_field(name="Losses", value=userLoss, inline=True)
-    embedUser.add_field(name="Winrate", value=userWR, inline=True)
-    embedUser.add_field(name="LP", value=userlp, inline=True)
+        embedUser=discord.Embed(title=ctx.author.display_name , url="https://github.com/Tentacultist/Inhouses", description=gameDescription, color=0x006cfa)
+        embedUser.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
+        embedUser.set_thumbnail(url=ctx.author.avatar_url)
 
-    msg = await ctx.send(embed=embedUser)
+        embedUser.add_field(name="IGN", value=userdata.find_one({"userid":str(userid)})["ign"], inline=False)
+        embedUser.add_field(name="Rank", value=userdata.find_one({"userid":str(userid)})["rank"], inline=True)
+        embedUser.add_field(name="Wins", value=userdata.find_one({"userid":str(userid)})["win"], inline=True)
+        embedUser.add_field(name="Losses", value=userdata.find_one({"userid":str(userid)})["loss"], inline=True)
+        embedUser.add_field(name="Winrate", value=userdata.find_one({"userid":str(userid)})["winrate"], inline=True)
+        embedUser.add_field(name="LP", value=userdata.find_one({"userid":str(userid)})["lp"], inline=True)
 
+        msg = await ctx.send(embed=embedUser)
+
+    else:
+        await ctx.send("You are not in our database, use `!setup <ign>`")
 
 # past lobbies :^)
 

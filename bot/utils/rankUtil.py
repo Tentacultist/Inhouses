@@ -56,6 +56,9 @@ def rankValue(rank: str) -> int:
     if rank == "Master":
         rankValue = 40
 
+    if rank == "Unranked":
+        rankValue = 1
+        
     strSplit = rank.split()
 
     rankWord = strSplit[0]
