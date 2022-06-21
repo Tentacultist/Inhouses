@@ -113,12 +113,13 @@ async def delete(ctx):
         await ctx.send("You are not in our database")
 
 # 5 v 5 lobby, automatically balanced based on rank, then decide winners and losers, winners increment wins, losers increment loss, win/win+loss for winrate
+# swap sides?
 @bot.command("lobby")
 async def createLobby(ctx):
 
     datestr = date.today().strftime("%m/%d/%Y")
     timestr = datetime.now().strftime("%H:%M")
-    description = "5v5 Lobby created at " + timestr + " on " +  datestr + "\n\n**For Players**\nTo join, react with ✅\nTo leave, react with ❌\n\n**For Lobby Leader**\nTo close the lobby, react with 😭\n To begin match, react with 💢\n"
+    description = "5v5 Lobby created at " + timestr + " on " +  datestr + "\n\n**For Players**\nTo Setup use command !setup \"ign\"\nTo join, react with ✅\nTo leave, react with ❌\n\n**For Lobby Leader**\nTo close the lobby, react with 😭\n To begin match, react with 💢\n"
     
     embed=discord.Embed(title="League 5v5 Lobby" , url="https://github.com/Tentacultist/Inhouses", description=description, color=0x006cfa)
     embed.set_author(name=ctx.message.author.name, icon_url=ctx.author.avatar_url)
@@ -147,6 +148,13 @@ async def createLobby(ctx):
 
         userid = reaction[1].id
         user = await bot.fetch_user(userid)
+
+        # make sure to ping the person
+        if(userdata.find_one({"userid":str(userid)})) == None:
+            await ctx.send("You are not setup yet")
+            await msg.clear_reaction(reaction[0], user)
+            continue
+
         usernick = userdata.find_one({"userid":str(userid)})["ign"]
 
         # closes lobby
@@ -341,7 +349,7 @@ async def profile(ctx):
         embedUser.add_field(name="Rank", value=userdata.find_one({"userid":str(userid)})["rank"], inline=True)
         embedUser.add_field(name="Wins", value=userdata.find_one({"userid":str(userid)})["win"], inline=True)
         embedUser.add_field(name="Losses", value=userdata.find_one({"userid":str(userid)})["loss"], inline=True)
-        embedUser.add_field(name="Winrate", value=userdata.find_one({"userid":str(userid)})["winrate"], inline=True)
+        embedUser.add_field(name="Winrate", value=round(userdata.find_one({"userid":str(userid)})["winrate"],2), inline=True)
         embedUser.add_field(name="LP", value=userdata.find_one({"userid":str(userid)})["lp"], inline=True)
 
         msg = await ctx.send(embed=embedUser)

@@ -49,15 +49,19 @@ def rankValue(rank: str) -> int:
 
     if rank == "Challenger":
         rankValue = 45
+        return rankValue
 
     if rank == "Grandmaster":
         rankValue = 42
+        return rankValue
 
     if rank == "Master":
         rankValue = 40
+        return rankValue
 
     if rank == "Unranked":
         rankValue = 1
+        return rankValue
         
     strSplit = rank.split()
 

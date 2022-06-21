@@ -14,7 +14,7 @@ def embedEdit(ctx, playerlist: list) -> discord.Embed:
 
     datestr = date.today().strftime("%m/%d/%Y")
     timestr = datetime.now().strftime("%H:%M")
-    description = "5v5 Lobby created at " + timestr + " on " +  datestr + "\n\n**For Players**\nTo join, react with ✅\nTo leave, react with ❌\n\n**For Lobby Leader**\nTo close the lobby, react with 😭\n To begin match, react with 💢\n"
+    description = "5v5 Lobby created at " + timestr + " on " +  datestr + "\n\n**For Players**\nTo Setup use command !setup \"ign\"\nTo join, react with ✅\nTo leave, react with ❌\n\n**For Lobby Leader**\nTo close the lobby, react with 😭\n To begin match, react with 💢\n"
 
     embedAdd=discord.Embed(title="League 5v5 Lobby" , url="https://github.com/Tentacultist/Inhouses", description=description, color=0x006cfa)
     embedAdd.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)
@@ -48,5 +48,8 @@ def splitTeams(playeridlist: list, playerRVList: list):
             teamOne.append(sortedPlayerID[i])
             teamOneRV += playerRVList[i]
 
+    print(teamOneRV)
+    print(teamTwoRV)
+    
     return teamOne, teamTwo
 
