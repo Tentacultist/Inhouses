@@ -152,7 +152,7 @@ async def createLobby(ctx):
         # make sure to ping the person
         if(userdata.find_one({"userid":str(userid)})) == None:
             await ctx.send("You are not setup yet")
-            await msg.clear_reaction(reaction[0], user)
+            await msg.remove_reaction(reaction[0], user)
             continue
 
         usernick = userdata.find_one({"userid":str(userid)})["ign"]

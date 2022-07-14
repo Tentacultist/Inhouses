@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from datetime import date, datetime
-
+import random
 
 
 # checks if the author of the new message is the author of the command, also in same channel
@@ -26,7 +26,13 @@ def embedEdit(ctx, playerlist: list) -> discord.Embed:
 def splitTeams(playeridlist: list, playerRVList: list):
 
     # sorts both based on the RV, reverses them so its largest to smallest
-    sortedPlayerID = [x for _,x in sorted(zip(playerRVList, playeridlist,))]
+
+    playerVarianceList = []
+
+    for RV in playerRVList:
+        playerVarianceList = RV + random.randint(-5,5)
+
+    sortedPlayerID = [x for _,x in sorted(zip(playerVarianceList, playeridlist,))]
     sortedPlayerID.reverse()
     
     playerRVList.sort()
